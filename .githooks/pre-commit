@@ -1,0 +1,5 @@
+#!/bin/sh
+# Block the commit when manager/GUIDE.md is out of date or the public-safety scan fails.
+# Enable once: git config core.hooksPath .githooks
+python3 manager/scripts/build_guide.py --check || python manager/scripts/build_guide.py --check || exit 1
+bash scripts/check-before-push.sh >/dev/null || { bash scripts/check-before-push.sh; exit 1; }

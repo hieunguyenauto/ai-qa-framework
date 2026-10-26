@@ -1,0 +1,23 @@
+{
+  "name": "demo-shop-automation",
+  "private": true,
+  "description": "Playwright automation for the demo shop. Only input: LOCKED test cases.",
+  "scripts": {
+    "test": "playwright test --project=shop",
+    "test:headed": "playwright test --project=shop --headed",
+    "test:ui": "playwright test --project=shop --ui",
+    "list": "playwright test --project=shop --list",
+    "typecheck": "tsc --noEmit",
+    "gen": "node scripts/gen-specs.mjs",
+    "gen:check": "node scripts/gen-specs.mjs --check",
+    "recon": "playwright test --project=recon",
+    "report": "node scripts/open-report.mjs",
+    "summary": "node scripts/summary.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0",
+    "@types/node": "^22.0.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.6.3"
+  }
+}

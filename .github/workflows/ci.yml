@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: GUIDE.md is up to date
+        run: python3 manager/scripts/build_guide.py --check
+      - name: Public-safety scan
+        run: bash scripts/check-before-push.sh
+
+  demo-shop:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/demo-shop/automation/web
+    env:
+      ENV: demo
+      BROWSER_CHANNEL: chromium
+      # Public password of the demo site (shown on its login page), not a secret.
+      SHOP_PASSWORD: secret_sauce
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: examples/demo-shop/automation/web/package-lock.json
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Generated specs match LOCKED test cases
+        run: npm run gen:check
+      - run: npx playwright install --with-deps chromium
+      - name: Run demo suite
+        run: npm test
+      - name: Summary
+        if: always()
+        run: npm run -s summary >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-shop-reports
+          path: examples/demo-shop/automation/web/reports/
+          retention-days: 14

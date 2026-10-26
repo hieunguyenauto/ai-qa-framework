@@ -1,0 +1,13 @@
+# 2026-10-13 Navigating away before the dashboard API returns → slow-load dialog on the next page
+- Type: TIMING (plus ENV: the dashboard API of one environment sometimes hangs > 30s)
+- Source: two regression TCs (production CMS, staging-like environment)
+- Function / screen: dashboard (GET /api/home) → next menu screen
+- Symptom: a '確認' dialog "表示に時間がかかっております…" blocked the menu click ("intercepts pointer events"); sometimes the next page showed '該当データが0件でした' and the app reloaded itself. Real users never saw it.
+- Root cause: the test clicked the menu ~1s after login while GET /api/home was still pending (a real user waits for the dashboard). In one environment that API sometimes took > 30s while others took ~100ms.
+- Fix:
+  - waitDashboardApi(): catch the request before clicking login, wait for the real response (max env apiMaxWaitMs = 120s). Slower than apiPerfLimitMs (30s) / no response / HTTP error → annotation 'perf' (SUMMARY + reports/PERFORMANCE.md), no failure, continue. Used by loginAs.
+  - page.addLocatorHandler for that exact dialog: click OK + annotation 'env-warning' + wait. NO reload / retry (agreed with the user: if the app reloads itself let it; the code reloads only when the TC says F5).
+  - Shared helper waitApiPerf(page, match, label) in common/wait.ts.
+  - Result: 5/5 passed, no more dialogs; slow API calls are recorded as PERFORMANCE.
+- Rule: R18
+- Applies to: every login / page with a heavy API that loads later; every app error dialog caused by a slow environment.

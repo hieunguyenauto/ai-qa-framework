@@ -1,0 +1,18 @@
+{
+  "name": "demo",
+  "baseUrl": "https://www.saucedemo.com",
+  "locale": "ja-JP",
+  "timezoneId": "Asia/Tokyo",
+  "actionTimeoutMs": 15000,
+  "navigationTimeoutMs": 30000,
+  "testTimeoutMs": 60000,
+  "apiPerfLimitMs": 10000,
+  "accounts": {
+    "standard": { "loginId": "standard_user", "note": "Normal user" },
+    "locked": { "loginId": "locked_out_user", "note": "Cannot log in" },
+    "problem": { "loginId": "problem_user", "note": "Built-in UI defects (BUG-001, BUG-003)" },
+    "performance": { "loginId": "performance_glitch_user", "note": "Slow login" },
+    "error": { "loginId": "error_user", "note": "Built-in functional errors (BUG-002)" },
+    "visual": { "loginId": "visual_user", "note": "Built-in visual differences" }
+  }
+}
